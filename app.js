@@ -30,19 +30,48 @@ console.log("http server listening on %d", port);
 const wss = new WebSocketServer({server: server});
 console.log("websocket server created");
 
+function control(obj) {
+    if (obj.code) {
+        switch (obj.code) {
+            case 'add':
+                profiles.push({
+                    id: 223,
+                    code: 'T-23',
+                    type: '2-пазовый',
+                    series: 'Оптима',
+                    height: '45',
+                    width: '45',
+                    length: '6',
+                    price: '240',
+                    colors: 'по RAL',
+                    provider: 'Петралюм',
+                    description: 'Открыть',
+                    images: '/img/Optima1 (1).png',
+                    scheme: '/img/Optima1 (1).png',
+                });
+                break;
+            case 'remove':
+                profiles.splice(profiles.length - 1, 1);
+                break;
+        }
+    }
+}
+
+const getProfile = () => JSON.stringify(profiles ? profiles : []);
+
+
 wss.on("connection", function (ws) {
     ws.on('message', m => {
-
-        wss.clients.forEach(client => {
-            profiles.push(profiles[0]);
-            if (client.redyState === WebSocket.OPEN) {
-                client.send(JSON.stringify(profiles));
-            }
-
-
-        });
+        control(JSON.parse(m));
+        if (profiles) {
+            wss.clients.forEach(client => {
+                if (client.redyState === WebSocketServer.OPEN) {
+                    client.send(getProfile());
+                }
+            });
+        }
     });
-    ws.send(JSON.stringify(profiles));
+    ws.send(getProfile());
 });
 
 
