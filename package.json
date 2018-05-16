@@ -7,6 +7,10 @@
   "scripts": {
     "start": "node index.js"
   },
+  "engines": {
+    "node": "0.8.x",
+    "npm": "1.2.x"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Andriy-Goncharenko/ierp-server.git"

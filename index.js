@@ -1,10 +1,8 @@
 const express = require('express');
 const app = express();
 const WebSocket = require('ws');
-const expressWs = require('express-ws')(app);
-
-const wsInstance = expressWs.getWss('/');
-
+const WSS = new WebSocket.Server({port: 3030});
+const http = require('http');
 const profiles = [{
     id: 223,
     code: 'T-23',
@@ -21,26 +19,29 @@ const profiles = [{
     scheme: '/img/Optima1 (1).png',
 }];
 
-app.use(function (req, res, next) {
-    return next();
-});
 
-app.get('/', (req, res) => {
-    res.send('Привет Андрей');
-});
+WSS.on('connection', ws => {
 
-app.ws('/', ws => {
-    ws.on('message', message => {
+    ws.on('message', m => {
         profiles.push(profiles[0]);
-        wsInstance.clients.forEach(client => {
-            console.log(client.readyState, WebSocket.OPEN);
+        WSS.clients.forEach(client => {
             if (client.readyState === WebSocket.OPEN) {
                 client.send(JSON.stringify(profiles));
             }
         });
     });
+
     ws.send(JSON.stringify(profiles));
+
 });
 
-app.listen(8080);
+
+app.get('/', (req, res) => {
+    res.send('Привет Андрей');
+});
+
+
+http.createServer(app).listen(8080, function () {
+    console.log("Express server listening on port Number" + 8080);
+});
 
