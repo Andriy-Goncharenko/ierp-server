@@ -1,14 +1,12 @@
+/*
 const express = require('express');
 const app = express();
-app.use(express.static('public'));
-
-
-/*const WebSocket = require('ws');
+const WebSocket = require('ws');
 const expressWs = require('express-ws')(app);
 
-const wsInstance = expressWs.getWss('/');*/
+const wsInstance = expressWs.getWss('/');
 
-/*const profiles = [{
+const profiles = [{
     id: 223,
     code: 'T-23',
     type: '2-пазовый',
@@ -22,13 +20,16 @@ const wsInstance = expressWs.getWss('/');*/
     description: 'Открыть',
     images: '/img/Optima1 (1).png',
     scheme: '/img/Optima1 (1).png',
-}];*/
+}];
+
+app.use(function (req, res, next) {
+    return next();
+});
 
 app.get('/', (req, res) => {
     res.send('Привет Андрей');
 });
 
-/*
 app.ws('/', ws => {
     ws.on('message', message => {
         profiles.push(profiles[0]);
@@ -41,6 +42,15 @@ app.ws('/', ws => {
     });
     ws.send(JSON.stringify(profiles));
 });
-*/
 
-app.listen(8080);
+app.listen(8080);*/
+const express = require('express');
+const app = express();
+
+app.get('/', function (req, res) {
+    res.send('Hello World!');
+});
+
+app.listen(3000, function () {
+    console.log('Example app listening on port 3000!');
+});
