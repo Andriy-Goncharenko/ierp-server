@@ -1,13 +1,10 @@
 const express = require('express');
-const http = require('http');
-const url = require('url');
-const WebSocket = require('ws');
-
 const app = express();
+const WebSocket = require('ws');
+const expressWs = require('express-ws')(app);
 
-app.get('/', (req, res) => {
-    res.send('Привет Андрей');
-});
+const wsInstance = expressWs.getWss('/');
+
 const profiles = [{
     id: 223,
     code: 'T-23',
@@ -24,14 +21,19 @@ const profiles = [{
     scheme: '/img/Optima1 (1).png',
 }];
 
-const server = http.createServer(app);
-const wss = new WebSocket.Server({server});
+app.use(function (req, res, next) {
+    return next();
+});
 
-wss.on('connection', ws => {
+app.get('/', (req, res) => {
+    res.send('Привет Андрей');
+});
 
+app.ws('/', ws => {
     ws.on('message', message => {
         profiles.push(profiles[0]);
-        wss.clients.forEach(client => {
+        wsInstance.clients.forEach(client => {
+            console.log(client.readyState, WebSocket.OPEN);
             if (client.readyState === WebSocket.OPEN) {
                 client.send(JSON.stringify(profiles));
             }
@@ -40,6 +42,4 @@ wss.on('connection', ws => {
     ws.send(JSON.stringify(profiles));
 });
 
-server.listen(8080, function listening() {
-    console.log('Listening on %d', server.address().port);
-});
+app.listen(8080);
