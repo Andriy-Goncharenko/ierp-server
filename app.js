@@ -1,8 +1,9 @@
-const express = require('express');
+const WebSocketServer = require("ws").Server;
+const http = require("http");
+const express = require("express");
 const app = express();
-const WebSocket = require('ws');
-const WSS = new WebSocket.Server({port: 3030});
-const http = require('http');
+const port = process.env.PORT || 5000;
+
 const profiles = [{
     id: 223,
     code: 'T-23',
@@ -19,29 +20,20 @@ const profiles = [{
     scheme: '/img/Optima1 (1).png',
 }];
 
+app.use(express.static(__dirname + "/"));
 
-WSS.on('connection', ws => {
+const server = http.createServer(app);
+server.listen(port);
 
-    ws.on('message', m => {
-        profiles.push(profiles[0]);
-        WSS.clients.forEach(client => {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify(profiles));
-            }
-        });
-    });
+console.log("http server listening on %d", port);
 
+const wss = new WebSocketServer({server: server});
+console.log("websocket server created");
+
+wss.on("connection", function (ws) {
     ws.send(JSON.stringify(profiles));
-
 });
 
 
-app.get('/', (req, res) => {
-    res.send('Привет Андрей');
-});
 
-
-http.createServer(app).listen(8080, function () {
-    console.log("Express server listening on port Number" + 8080);
-});
 
