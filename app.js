@@ -32,6 +32,7 @@ console.log("websocket server created");
 
 wss.on("connection", function (ws) {
     ws.on('message', m => {
+
         wss.clients.forEach(client => {
             profiles.push(profiles[0]);
             if (client.redyState === WebSocket.OPEN) {
