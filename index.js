@@ -5,8 +5,8 @@ const WebSocket = require('ws');
 
 const app = express();
 
-app.use(function (req, res) {
-    res.send({msg: "hello"});
+app.get('/', (req, res) => {
+    res.send('Привет Андрей');
 });
 const profiles = [{
     id: 223,
