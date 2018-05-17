@@ -25,12 +25,17 @@ app.use(express.static(__dirname + "/"));
 const server = http.createServer(app);
 server.listen(port);
 
-console.log("http server listening on %d", port);
-
 const wss = new WebSocketServer({server: server});
-console.log("websocket server created");
 
-function control(obj) {
+const sendClients = res => {
+    wss.clients.forEach(client => {
+        if (client.redyState === WebSocketServer.OPEN) {
+            client.send(res);
+        }
+    });
+};
+
+function control(obj, ws) {
     if (obj.code) {
         switch (obj.code) {
             case 'add':
@@ -49,9 +54,14 @@ function control(obj) {
                     images: '/img/Optima1 (1).png',
                     scheme: '/img/Optima1 (1).png',
                 });
+                sendClients(getProfile());
                 break;
             case 'remove':
                 profiles.splice(profiles.length - 1, 1);
+                sendClients(getProfile());
+                break;
+            case 'get':
+                ws.send(getProfile());
                 break;
         }
     }
@@ -59,19 +69,12 @@ function control(obj) {
 
 const getProfile = () => JSON.stringify(profiles ? profiles : []);
 
+wss.on("connection", ws => {
 
-wss.on("connection", function (ws) {
     ws.on('message', m => {
-        control(JSON.parse(m));
-        if (profiles) {
-            wss.clients.forEach(client => {
-                if (client.redyState === WebSocketServer.OPEN) {
-                    client.send(getProfile());
-                }
-            });
-        }
+        control(JSON.parse(m), ws);
     });
-    ws.send(getProfile());
+
 });
 
 
