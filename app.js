@@ -75,6 +75,25 @@ function addProfile(obj) {
                 }
             })
         });
+
+    }
+    if (obj.painting) {
+        obj.painting.forEach(t => {
+            db.find('colour', {name: t}).then(i => {
+                if (!i) {
+                    db.add('colour', {name: t}).then(o => {
+                        if (o.status === 1) {
+                            db.getAll("colour").then(arr => sendClients(stringify({
+                                label: "colour",
+                                items: arr
+                            }))).catch(err => {
+                                throw err
+                            });
+                        }
+                    })
+                }
+            })
+        });
     }
 
 }
