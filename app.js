@@ -5,6 +5,7 @@ const express = require("express");
 const db = require("./db/materials");
 const app = express();
 const port = process.env.PORT || 5050;
+const ObjectId = require('mongodb').ObjectId;
 
 
 app.use(express.static(__dirname + "/"));
@@ -111,25 +112,41 @@ function control(obj, ws) {
                         db.getAll(obj.collection).then(arr => sendClients(stringify({
                             label: obj.collection,
                             items: arr
-                        }))).catch(err => {
-                            throw err
-                        });
+                        })));
                     }
                 });
                 break;
             case 'remove':
-                sendClients(getProfile());
+                obj.find._id = ObjectId(obj.find._id);
+                db.remove(obj.collection, obj.find).then(i => {
+                    if (i) {
+                        ws.send(stringify({
+                            label: "remove/" + obj.collection,
+                            status: i.status
+                        }));
+                        db.getAll(obj.collection).then(arr => sendClients(stringify({
+                            label: obj.collection,
+                            items: arr
+                        })));
+                    }
+                }).catch((e) => console.log(e));
                 break;
             case 'get':
-                ws.send(getProfile());
+                obj.find._id = ObjectId(obj.find._id);
+                db.find(obj.collection, obj.find).then(i => {
+                    if (i) {
+                        ws.send(stringify({
+                            label: "get/" + obj.collection,
+                            item: i
+                        }));
+                    }
+                }).catch((e) => console.log(e));
                 break;
             case 'getAll':
                 db.getAll(obj.collection).then(arr => ws.send(stringify({
                     label: obj.collection,
                     items: arr
-                }))).catch(err => {
-                    throw err
-                });
+                })));
                 break;
         }
     }

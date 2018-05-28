@@ -28,6 +28,19 @@ const find = (collection, query) => {
         });
     });
 };
+const remove = (collection, query) => {
+    return promise = new Promise((resolve, reject) => {
+        MongoClient.connect(url, (err, db) => {
+            if (err) reject(err);
+            const dbo = db.db("ierp-db");
+            dbo.collection(collection).remove(query, (err, res) => {
+                if (err) reject(err);
+                resolve({status: 1});
+            });
+            db.close();
+        });
+    });
+};
 const add = (collection, obj) => {
     return promise = new Promise((resolve, reject) => {
         MongoClient.connect(url, (err, db) => {
@@ -47,6 +60,7 @@ const add = (collection, obj) => {
 exports.getAll = getAll;
 exports.add = add;
 exports.find = find;
+exports.remove = remove;
 /*
 MongoClient.connect(url, (err, db) => {
     if (err) throw err;
