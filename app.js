@@ -1,6 +1,7 @@
 const mongo = require('mongodb');
 const WebSocketServer = require("ws").Server;
-const http = require("http");
+const https = require('https');
+const http = require('http');
 const path = require('path');
 const express = require("express");
 const db = require("./db/materials");
@@ -15,7 +16,6 @@ app.get('/*', function (req, res) {
     res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 const server = http.createServer(app);
-console.log(port);
 server.listen(port);
 
 const wss = new WebSocketServer({server: server});
