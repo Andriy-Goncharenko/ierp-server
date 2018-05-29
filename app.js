@@ -1,6 +1,7 @@
 const mongo = require('mongodb');
 const WebSocketServer = require("ws").Server;
 const http = require("http");
+const path = require('path');
 const express = require("express");
 const db = require("./db/materials");
 const app = express();
@@ -8,8 +9,11 @@ const port = process.env.PORT || 5050;
 const ObjectId = require('mongodb').ObjectId;
 
 
-app.use(express.static(__dirname + "/"));
+app.use(express.static(path.join(__dirname, 'build')));
 
+app.get('/*', function (req, res) {
+    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
 const server = http.createServer(app);
 console.log(port);
 server.listen(port);
