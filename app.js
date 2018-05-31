@@ -1,26 +1,19 @@
-const mongo = require('mongodb');
-const WebSocketServer = require("ws").Server;
-const http = require('http');
-const path = require('path');
-const express = require("express");
 const db = require("./db/materials");
-const app = express();
 const ObjectId = require('mongodb').ObjectId;
+const express = require('express');
+const SocketServer = require('ws').Server;
 
+const PORT = process.env.PORT || 3000;
 
-app.use(express.static(path.join(__dirname, 'build')));
+const server = express()
+    .use((req, res) => res.send(`Listening on ${ PORT }`))
+    .listen(PORT, () => console.log(`Listening on ${ PORT }`));
 
-app.get('/*', function (req, res) {
-    res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
-const server = http.createServer(app);
-server.listen(5050);
-
-const wss = new WebSocketServer({server: server});
+const wss = new SocketServer({server});
 
 const sendClients = res => {
     wss.clients.forEach(client => {
-        if (client.redyState === WebSocketServer.OPEN) {
+        if (client.redyState === SocketServer.OPEN) {
             client.send(res);
         }
     });
