@@ -41,6 +41,19 @@ const remove = (collection, query) => {
         });
     });
 };
+const update = (collection, id, query) => {
+    return promise = new Promise((resolve, reject) => {
+        MongoClient.connect(url, (err, db) => {
+            if (err) reject(err);
+            const dbo = db.db("ierp-db");
+            dbo.collection(collection).updateOne({_id: id}, query, (err, res) => {
+                if (err) reject(err);
+                resolve({status: 2});
+            });
+            db.close();
+        });
+    });
+};
 const add = (collection, obj) => {
     return promise = new Promise((resolve, reject) => {
         MongoClient.connect(url, (err, db) => {
@@ -61,40 +74,4 @@ exports.getAll = getAll;
 exports.add = add;
 exports.find = find;
 exports.remove = remove;
-/*
-MongoClient.connect(url, (err, db) => {
-    if (err) throw err;
-
-    const dbo = db.db("ierp-db");
-
-    const obj = {
-        vc: "T23",
-        type: "2-x пазовый",
-        series: "OPTIMA",
-        thickness: "45",
-        width: "45",
-        length: "6",
-        price: "336",
-        images: ["/img/Optima1 (1).png"],
-        scheme: ["/img/1526756056366.jpg"],
-        provider: ["Перталюм"],
-        groove: "8.5",
-        material: "Алюминий",
-        painting: ["RAL 9016"],
-        description: "",
-        catalog: "https://drive.google.com/file/d/0B7nlCQdCENfwc25rYW5Kc0RnVGM/view"
-    };
-    /!*dbo.collection("materialsProfiles").insertOne(obj, (err, res) => {
-        if (err) throw err;
-        console.log("Добавил");
-        db.close();
-    }); *!/
-    dbo.collection("materialsProfiles").find({}).toArray((err, res) => {
-        if (err) throw err;
-        console.log(res);
-        db.close();
-    });
-
-    db.close();
-})
-;*/
+exports.update = update;

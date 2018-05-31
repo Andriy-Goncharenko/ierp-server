@@ -1,12 +1,10 @@
 const mongo = require('mongodb');
 const WebSocketServer = require("ws").Server;
-const https = require('https');
 const http = require('http');
 const path = require('path');
 const express = require("express");
 const db = require("./db/materials");
 const app = express();
-const port = process.env.PORT || 5050;
 const ObjectId = require('mongodb').ObjectId;
 
 
@@ -16,7 +14,7 @@ app.get('/*', function (req, res) {
     res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 const server = http.createServer(app);
-server.listen(port);
+server.listen(5050);
 
 const wss = new WebSocketServer({server: server});
 
@@ -126,6 +124,21 @@ function control(obj, ws) {
                     if (i) {
                         ws.send(stringify({
                             label: "remove/" + obj.collection,
+                            status: i.status
+                        }));
+                        db.getAll(obj.collection).then(arr => sendClients(stringify({
+                            label: obj.collection,
+                            items: arr
+                        })));
+                    }
+                }).catch((e) => console.log(e));
+                break;
+            case 'update':
+                obj.id = ObjectId(obj.id);
+                db.update(obj.collection, obj.id, obj.item).then(i => {
+                    if (i) {
+                        ws.send(stringify({
+                            label: "update/" + obj.collection,
                             status: i.status
                         }));
                         db.getAll(obj.collection).then(arr => sendClients(stringify({
